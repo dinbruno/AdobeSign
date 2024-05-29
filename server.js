@@ -3,8 +3,6 @@ const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
 
-// Enable CORS for all origins
-
 const app = express();
 const port = 3000;
 
@@ -20,8 +18,6 @@ app.use(function (req, res, next) {
 const apiKey =
   "3AAABLblqZhDMWedNROcowLqrO_ywCMZVdqMBxn4AF7-woOw6YAo1LYkUt-xEaNnYTeeO-9tS3abHAikOuHg_Tv0qTHq0Scc2";
 
-const name = "2805";
-
 async function getBaseUri() {
   try {
     const response = await axios.get(
@@ -33,33 +29,6 @@ async function getBaseUri() {
     return response.data.apiAccessPoint;
   } catch (error) {
     console.error("Erro ao obter o URI base:", error.response.data.message);
-    return null;
-  }
-}
-
-// Função para fazer upload do documento e obter o ID do documento transitório
-async function uploadDocumentAndGetTransientId(filePath, baseUri) {
-  const fileBuffer = fs.readFileSync(filePath);
-  const formData = new FormData();
-  formData.append("File", fileBuffer, "document.pdf");
-
-  try {
-    const response = await axios.post(
-      `${baseUri}/api/rest/v6/transientDocuments`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          ...formData.getHeaders(),
-        },
-      }
-    );
-    return response.data.transientDocumentId;
-  } catch (error) {
-    console.error(
-      "Erro ao fazer upload do documento:",
-      error.response.data.message
-    );
     return null;
   }
 }
@@ -189,7 +158,7 @@ async function downloadSignedDocument(req, res, widgetId, baseUri) {
     );
     res.setHeader("Content-Type", "application/pdf");
     res.send(getDocumentById.data);
-    
+
   } catch (error) {
     console.error("Erro ao baixar o documento assinado:", error.message);
     res.status(500).send("Erro ao baixar o documento assinado.");
@@ -206,6 +175,9 @@ async function getAllTemplates(baseUri) {
         },
       }
     );
+
+    console.log(response.data, "response.data")
+
     return response.data; // Retorna a lista de templates
   } catch (error) {
     console.error(
@@ -225,6 +197,8 @@ app.get("/run", async (req, res) => {
     res.status(500).send("Falha ao obter o URI base.");
     return;
   }
+
+  await getAllTemplates(baseUri)
 
   // Criar o widget
   const widgetResponse = await createWidget(
