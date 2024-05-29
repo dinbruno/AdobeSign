@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinatura de Documento</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <h1>Assine o Documento</h1>
+    <!-- Iframe onde o widget será carregado -->
+    <iframe id="signWidget" width="100%" height="600px" style="border:none;"></iframe>
+    <button id="loadWidget" style="margin-top: 20px; display:block;">Carregar Widget</button>
+
+    <script>
+
+        let widgetId = null;
+
+        function loadSignatureWidget() {
+            axios.get('https://1ba5-2804-14c-155-61aa-f822-d17d-bea2-5069.ngrok-free.app/run')
+                .then(function (response) {
+                    console.log(response)
+                    document.getElementById('signWidget').src = response.data.iframeEmbedCode;
+                    console.log("Widget carregado com sucesso!");
+
+                    widgetId = response.data.widgetId;
+
+                })
+                .catch(function (error) {
+                    console.error("Erro ao carregar o widget:", error);
+                });
+        }
+
+        document.getElementById('loadWidget').addEventListener('click', function () {
+            loadSignatureWidget();
+        });
+
+        function downloadWidgetDocument() {
+            return window.open(`https://1ba5-2804-14c-155-61aa-f822-d17d-bea2-5069.ngrok-free.app/${widgetId}/document`);
+        }
+
+        window.addEventListener('message', function (event) {
+            console.log(event)
+            if (event.data.includes("ESIGN")) {
+                console.log('Documento assinado com sucesso!');
+                downloadWidgetDocument();
+            }
+        });
+    </script>
+</body>
+
+</html>
