@@ -19,7 +19,7 @@
         let widgetId = null;
 
         function loadSignatureWidget() {
-            axios.get('https://1c0f-2804-14c-155-61aa-f822-d17d-bea2-5069.ngrok-free.app/run')
+            axios.get('http://localhost:3000/run')
                 .then(function (response) {
                     console.log(response)
                     document.getElementById('signWidget').src = response.data.iframeEmbedCode;
@@ -38,7 +38,7 @@
         });
 
         function downloadWidgetDocument() {
-            return window.open(`https://1c0f-2804-14c-155-61aa-f822-d17d-bea2-5069.ngrok-free.app/${widgetId}/document`);
+            return window.open(`http://localhost:3000/${widgetId}/document`);
         }
 
         window.addEventListener('message', function (event) {
